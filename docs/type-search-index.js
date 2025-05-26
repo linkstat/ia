@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"ar.edu.uesiglo21","l":"ModeloHopfield"}];updateSearchResults();

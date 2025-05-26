@@ -252,6 +252,35 @@ public class ModeloHopfield {
     }
 
     /**
+     * Verifica la similitud entre dos patrones y muestra advertencia si son poco ortogonales.
+     * @param patron1 Primer patrón de memoria.
+     * @param patron2 Segundo patrón de memoria.
+     * @param umbral Umbral de advertencia (recomendado: 0.5)
+     */
+    public static void verificarSimilitudPatrones(int[] patron1, int[] patron2, double umbral) {
+        if (patron1 == null || patron2 == null || patron1.length != patron2.length) {
+            System.out.println("No se pueden comparar patrones: alguno es nulo o de diferente longitud.");
+            return;
+        }
+        int suma = 0;
+        for (int i = 0; i < patron1.length; i++) {
+            suma += patron1[i] * patron2[i];
+        }
+        double similitud = (double) suma / patron1.length;
+
+        System.out.printf("→ Similitud entre patrones: %.2f\n", similitud);
+
+        if (Math.abs(similitud) > umbral) {
+            System.out.println("⚠ ADVERTENCIA: Los patrones agregados son demasiado similares.");
+            System.out.println("  Un valor alto (positivo o negativo) significa patrones poco independientes y potencialmente problemáticos para la red de Hopfield.");
+            System.out.println("  Esto puede provocar confusión en la red de Hopfield.");
+        } else {
+            System.out.println("✓ Los patrones son suficientemente diferentes. Va a funcionar...");
+        }
+    }
+
+
+    /**
      * Método main que ejecuta un ejemplo de entrenamiento y recuperación de patrones.
      * El ejemplo, es el patron dado en la situación práctica planteada
      * @param args Argumentos estándar de ejecución (no utilizados en este ejemplo).
@@ -280,26 +309,26 @@ public class ModeloHopfield {
         patronLimpio[90] = 1;
         patronLimpio[91] = 1;
 
-        //int[][] patrones = { patronLimpio };
+        //int[][] patrones = { patronLimpio };7
 
         // Segundo patrón: una variante desplazada y con otros detalles (necesario para probar pseudoinversa)
         int[] patronLimpio2 = {
-                -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-                -1,-1,-1, 1, 1, 1,-1,-1,-1,-1,
-                -1,-1, 1,-1,-1, 1, 1,-1,-1,-1,
-                -1, 1,-1,-1, 1, 1, 1,-1,-1,-1,
-                -1, 1, 1, 1,-1,-1, 1, 1,-1,-1,
-                -1, 1, 1,-1,-1, 1, 1,-1,-1,-1,
-                -1,-1, 1, 1, 1, 1,-1,-1,-1,-1,
-                -1,-1,-1, 1, 1,-1,-1,-1,-1,-1,
-                1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-                1, 1,-1,-1,-1,-1,-1,-1,-1,-1
+                 1, 1, 1,-1, 1, 1, 1,-1, 1, 1,
+                -1,-1, 1, 1, 1,-1, 1, 1, 1,-1,
+                 1, 1, 1,-1, 1, 1, 1,-1,-1, 1,
+                 1, 1,-1,-1,-1,-1, 1, 1, 1, 1,
+                 1,-1,-1, 1, 1,-1,-1, 1,-1, 1,
+                 1,-1,-1, 1, 1,-1,-1, 1, 1, 1,
+                 1, 1,-1,-1,-1,-1, 1, 1,-1, 1,
+                 1,-1,-1,-1,-1, 1,-1, 1,-1, 1,
+                 1, 1, 1, 1,-1,-1, 1, 1, 1, 1,  // ref: elemento fijo está en pos. 80
+                 1, 1, 1, 1, 1, 1, 1, 1,-1, 1   // ref: elementos fijos en pos. 90 y 91
         };
         patronLimpio2[80] = 1;
         patronLimpio2[90] = 1;
         patronLimpio2[91] = 1;
 
-        // Patrón inicial dañado (nuevamente, siguiendo el ejemplo dado en e las consignas del TP)
+        // Patrón inicial dañado (nuevamente, siguiendo el ejemplo dado en las consignas del TP)
         // Dado que el patron dañado es básicamente el patrón limpio, pero desplazado unas 3 posiciones a la derecha y
         // con algo de suciedad en otras partes, vamos a generar nuestro patronSucio a partir del limpio (para no tener
         // que escribirlo manualmente, que también sería válido a los fines de probar el prototipo)
@@ -311,7 +340,7 @@ public class ModeloHopfield {
         patronSucio[90] = patronLimpio[90];
         patronSucio[91] = patronLimpio[91];
 
-        // Definimos posiciones con ruido (acorde a ejemplo del PDF con las consignas del TP)
+        // Definimos posiciones con ruido (acorde a ejemplo de las consignas del TP3)
         int[] posicionesConSuciedad = {
                 0, 7,
                 11, 14,
@@ -394,10 +423,14 @@ public class ModeloHopfield {
                     break;
                 case 7:
                     usarDosPatrones = !usarDosPatrones;
-                    System.out.printf("%s el segundo patrón de memoria. Ahora se %s %d patrón(es).\n",
+                    System.out.printf("%s el segundo patrón de memoria. Ahora se %s %d %s.\n",
                             usarDosPatrones ? "Agregado" : "Quitado",
                             usarDosPatrones ? "usan" : "usa",
-                            usarDosPatrones ? 2 : 1);
+                            usarDosPatrones ? 2 : 1,
+                            usarDosPatrones ? "patrones" : "patrón");
+                    if (usarDosPatrones) {
+                        verificarSimilitudPatrones(patronLimpio, patronLimpio2, 0.6);
+                    }
                     break;
                 case 0:
                     System.out.println("\n\nDe aquí hasta reconocer rostros no paramos ;-)!!!\nSaludos profes!!!");
